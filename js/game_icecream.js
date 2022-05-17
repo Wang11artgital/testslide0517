@@ -330,8 +330,14 @@ export default class Game{
             this.gameset.size.h = window.innerHeight
         }
         else if(window.innerWidth < 960 && window.innerHeight < 720){
-            this.gameset.size.w = window.innerHeight/3*4
-            this.gameset.size.h = window.innerHeight
+            if(window.innerWidth<window.innerHeight){
+                this.gameset.size.w = window.innerWidth
+                this.gameset.size.h = window.innerWidth/4*3
+            }
+            else{
+                this.gameset.size.w = window.innerHeight/3*4
+                this.gameset.size.h = window.innerHeight
+            }
         }
         this.initCanvas();
     }
@@ -339,6 +345,7 @@ export default class Game{
         this.gameset.container.allStage.width = this.gameset.size.w;
         this.gameset.container.allStage.height = this.gameset.size.h;
         this.gameset.container.allStage.position.set(window.innerWidth/2 - this.gameset.size.w/2,window.innerHeight/2 - this.gameset.size.h/2)
+        
     }
     onDragStart(event) {
         this.data = event.data;
