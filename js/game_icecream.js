@@ -24,8 +24,8 @@ export default class Game{
             hearts: 3,
             loader: PIXI.Loader.shared,
             size: {
-                w:960,
-                h:720
+                w:window.innerWidth,
+                h:window.innerHeight
             },
             bar_ticker: new PIXI.Ticker
         }
@@ -230,26 +230,6 @@ export default class Game{
         this.countHeart();
         this.resizeCanvas();
     }
-    resizeCanvas(){
-        this.app.renderer.resize(window.innerWidth,window.innerHeight);
-        if(window.innerWidth > 960 && window.innerHeight > 720){
-            this.gameset.size.w = 960
-            this.gameset.size.h = 720
-        }
-        else if(window.innerWidth < 960 && window.innerHeight > 720){
-            this.gameset.size.w = window.innerWidth
-            this.gameset.size.h = window.innerWidth/4*3
-        }
-        else if(window.innerWidth > 960 && window.innerHeight < 720){
-            this.gameset.size.w = window.innerHeight/3*4
-            this.gameset.size.h = window.innerHeight
-        }
-        else if(window.innerWidth < 960 && window.innerHeight < 720){
-            this.gameset.size.w = window.innerHeight/3*4
-            this.gameset.size.h = window.innerHeight
-        }
-        this.initCanvas();
-    }
     barLoop(){
         this.gameset.sprites.outerBar.x += this.gameset.sprites.outerBar.vx;
         if (this.gameset.sprites.outerBar.x>200 || this.gameset.sprites.outerBar.x<0){
@@ -335,9 +315,29 @@ export default class Game{
             this.gameset.container.gameStage.addChild(this.gameset.container.heartArea);
         }
     }
+    resizeCanvas(){
+        this.app.renderer.resize(window.innerWidth,window.innerHeight);
+        if(window.innerWidth > 960 && window.innerHeight > 720){
+            this.gameset.size.w = 960
+            this.gameset.size.h = 720
+        }
+        else if(window.innerWidth < 960 && window.innerHeight > 720){
+            this.gameset.size.w = window.innerWidth
+            this.gameset.size.h = window.innerWidth/4*3
+        }
+        else if(window.innerWidth > 960 && window.innerHeight < 720){
+            this.gameset.size.w = window.innerHeight/3*4
+            this.gameset.size.h = window.innerHeight
+        }
+        else if(window.innerWidth < 960 && window.innerHeight < 720){
+            this.gameset.size.w = window.innerHeight/3*4
+            this.gameset.size.h = window.innerHeight
+        }
+        this.initCanvas();
+    }
     initCanvas(){
-        this.gameset.container.allStage.width=this.gameset.size.w
-        this.gameset.container.allStage.height=this.gameset.size.h
+        this.gameset.container.allStage.width = this.gameset.size.w;
+        this.gameset.container.allStage.height = this.gameset.size.h;
         this.gameset.container.allStage.position.set(window.innerWidth/2 - this.gameset.size.w/2,window.innerHeight/2 - this.gameset.size.h/2)
     }
     onDragStart(event) {
