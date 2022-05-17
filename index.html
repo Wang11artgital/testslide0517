@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0 viewport-fit=cover"/>
+    <title>slider</title>
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+    <button id="button">進入遊戲</button>
+    <canvas id="mycanvas" class="canvasSet d-none loadering"></canvas>
+</body>
+<script src="https://pixijs.download/release/pixi.js"></script>
+<script src="https://unpkg.co/gsap@3/dist/gsap.min.js"></script>
+
+<script type="module">
+    import Game from './js/game_icecream.js';
+    // 前面參數是成功的function,後面失敗
+    var game = new Game(function(){console.log('成功')},function(){console.log('失敗')});
+    // 因 this 的指向是 button 所以要加 bind
+    document.getElementById('button').addEventListener("click",game.gameLoad.bind(game));
+</script>
+
+</html>
