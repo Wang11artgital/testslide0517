@@ -245,8 +245,8 @@ export default class Game{
             this.gameset.size.h = window.innerHeight
         }
         else if(window.innerWidth < 960 && window.innerHeight < 720){
-            this.gameset.size.w = window.innerWidth
-            this.gameset.size.h = window.innerWidth/4*3
+            this.gameset.size.w = window.innerHeight/3*4
+            this.gameset.size.h = window.innerHeight
         }
         this.initCanvas();
     }
