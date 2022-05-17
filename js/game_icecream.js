@@ -79,7 +79,7 @@ export default class Game{
         this.canvas.classList.remove("loadering");
         this.gameset.hearts = 3;
         this.app.renderer.backgroundColor = 0xfaa0aa;
-        // this.resizeCanvas();
+        this.resizeCanvas();
         
         // 底層遊戲-背景
         this.gameset.sprites.bg = new PIXI.Sprite(this.gameset.textures.bg);
@@ -190,7 +190,7 @@ export default class Game{
                 .beginFill(0x38404e)
                 .drawRect(
                     this.gameset.size.w*0.05,
-                    this.gameset.size.h*0.9,
+                    this.gameset.size.h*0.8,
                     this.gameset.size.w*0.9,
                     4,
                 )
@@ -201,7 +201,7 @@ export default class Game{
                 .beginFill(0x38404e)
                 .drawRect(
                     this.gameset.size.w*0.05,
-                    this.gameset.size.h*0.9,
+                    this.gameset.size.h*0.8,
                     this.gameset.size.w*0.9,
                     4,
                 )
@@ -214,7 +214,7 @@ export default class Game{
                 .drawCircle(0, 0, 8)
                 .endFill(),
         );
-        this.gameset.sprites.handle.position.set(this.gameset.size.w/2*0.1, this.gameset.size.h*0.9+2);
+        this.gameset.sprites.handle.position.set(this.gameset.size.w/2*0.1, this.gameset.size.h*0.8+2);
         this.gameset.sprites.handle.interactive = true;
         this.gameset.sprites.handle.buttonMode = true;
         this.gameset.sprites.handle
