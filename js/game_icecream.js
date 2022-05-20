@@ -1,3 +1,4 @@
+
 export default class Game{
     constructor(callback_s,callback_f){
         this.canvas = document.getElementById('mycanvas')
@@ -39,6 +40,10 @@ export default class Game{
         // 執行遊戲
         this.canvas.classList.remove("d-none");
         if(Object.keys(this.gameset.textures).length===0){
+            const video = document.createElement("video");
+            video.src = "image/video.mp4";
+            video.muted = true;
+            video.setAttribute("playsinline", "");
             for(let i = 1; i < 11;i++){
                 this.gameset.loader.add(`startBg-${i}`,`images/${i}.jpg`)
             }
@@ -62,6 +67,7 @@ export default class Game{
                     this.gameset.textures.rulebg = new PIXI.Texture(resource.rulebg.texture)
                     this.gameset.textures.startbtn = new PIXI.Texture(resource.startbtn.texture)
                     this.gameset.textures.nice = new PIXI.Texture(resource.nice.texture)
+                    this.gameset.video = PIXI.Sprite.from(video);
                     for(let i = 1; i < 11; i++){
                         let texture = new PIXI.Texture(resource[`startBg-${i}`].texture);
                         this.startBgTextureArray.push(texture);
@@ -270,14 +276,10 @@ export default class Game{
             });
             basicText.x = this.gameset.sprites.resultBg.width/2 - basicText.width/2;
             basicText.y = this.gameset.sprites.resultBg.height/2 - basicText.height/2;
-            const video = document.createElement("video");
-            video.src = "image/video.mp4";
-            video.muted = true;
-            video.setAttribute("playsinline", "");
-            const sprite = PIXI.Sprite.from(video);
-            sprite.width = this.gameset.sprites.resultBg.width
-            sprite.height = this.gameset.sprites.resultBg.height
-            this.gameset.container.resultStage.addChild(sprite);
+        
+            this.gameset.video.width = this.gameset.sprites.resultBg.width
+            this.gameset.video.height = this.gameset.sprites.resultBg.height
+            this.gameset.container.resultStage.addChild(this.gameset.video);
             this.status = 'success'
         }
         else if(this.gameset.sprites.outerBar.x<this.gameset.sprites.pointBar.x && this.gameset.hearts>1){
