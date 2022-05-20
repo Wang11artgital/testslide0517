@@ -2,6 +2,11 @@ body {
     margin: 0;
     padding: 0;
     overflow: hidden;
+    background-image: url('../image/bg-light.png');
+    background-size: cover;
+    background-position: center center;
+    width: 100vw;
+    height: 100vh;
 }
 body{
     padding-left: env(safe-area-inset-left);
@@ -12,7 +17,16 @@ body{
     top: 0;
     left: 0;
 } 
-
+.btn-pos{
+    position: absolute;
+    width: 15vw;
+    height: 20vh;
+    right: 25vw;
+    bottom: 18vh;
+    background-color: rgba(255,255,60,0.5);
+    border: none;
+    cursor: pointer;
+}
 .d-none {
     display: none;
 }
