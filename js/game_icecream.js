@@ -1,4 +1,3 @@
-
 export default class Game{
     constructor(callback_s,callback_f){
         this.canvas = document.getElementById('mycanvas')
@@ -8,7 +7,6 @@ export default class Game{
             backgroundAlpha:0.7,
             view: this.canvas
         })
-        this.startBgTextureArray = []
         this.gameset = {
             textures: {},
             container: {
@@ -28,27 +26,33 @@ export default class Game{
                 w:window.innerWidth,
                 h:window.innerHeight
             },
-            bar_ticker: new PIXI.Ticker
+            bar_ticker: new PIXI.Ticker,
+            videos:{}
         }
         this.callback = {
             s: callback_s,
             f: callback_f
         }
         this.status = ''
+        this.videoStart = document.createElement("video");
+        this.videoS = document.createElement("video");
+        this.videoF = document.createElement("video");
     }
     gameLoad() {
         // 執行遊戲
         this.canvas.classList.remove("d-none");
         if(Object.keys(this.gameset.textures).length===0){
-            const video = document.createElement("video");
-            video.src = "image/video.mp4";
-            video.muted = true;
-            video.setAttribute("playsinline", "");
-            for(let i = 1; i < 11;i++){
-                this.gameset.loader.add(`startBg-${i}`,`images/${i}.jpg`)
-            }
+            this.videoStart.src = "videos/start.mp4";
+            this.videoStart.muted = true;
+            this.videoStart.setAttribute("playsinline", "");
+            this.videoS.src = "videos/resultS.mp4";
+            this.videoS.muted = true;
+            this.videoS.setAttribute("playsinline", "");
+            this.videoF.src = "videos/resultF.mp4";
+            this.videoF.muted = true;
+            this.videoF.setAttribute("playsinline", "");
             this.gameset.loader
-                .add('bg','image/Rectangle.png')
+                .add('bg','image/game.jpg')
                 .add('sprite','image/ice2.png')
                 .add('heart','image/ice.png')
                 .add('mask','image/mask.png')
@@ -57,6 +61,7 @@ export default class Game{
                 .add('rulebg','image/rulebg.png')
                 .add('startbtn','image/startbtn.png')
                 .add('nice','image/nice.png')
+                .add('startbg','videos/start.jpg')
                 .load((loader, resource)=>{
                     this.gameset.textures.bg = new PIXI.Texture(resource.bg.texture)
                     this.gameset.textures.sprite = new PIXI.Texture(resource.sprite.texture)
@@ -67,11 +72,10 @@ export default class Game{
                     this.gameset.textures.rulebg = new PIXI.Texture(resource.rulebg.texture)
                     this.gameset.textures.startbtn = new PIXI.Texture(resource.startbtn.texture)
                     this.gameset.textures.nice = new PIXI.Texture(resource.nice.texture)
-                    this.gameset.video = PIXI.Sprite.from(video);
-                    for(let i = 1; i < 11; i++){
-                        let texture = new PIXI.Texture(resource[`startBg-${i}`].texture);
-                        this.startBgTextureArray.push(texture);
-                    }
+                    this.gameset.textures.startbg = new PIXI.Texture(resource.startbg.texture)
+                    this.gameset.textures.videoStart = PIXI.Texture.from(this.videoStart);
+                    this.gameset.textures.videoS = PIXI.Texture.from(this.videoS);
+                    this.gameset.textures.videoF = PIXI.Texture.from(this.videoF);
                 });
             this.gameset.loader.onComplete.add(()=>{this.drawCanvas()});
         }
@@ -87,7 +91,6 @@ export default class Game{
         this.canvas.classList.remove("loadering");
         this.gameset.hearts = 3;
         this.resizeCanvas();
-        
         // 底層遊戲-背景
         this.gameset.sprites.bg = new PIXI.Sprite(this.gameset.textures.bg);
         this.gameset.sprites.bg.x = this.gameset.size.w / 2;
@@ -134,39 +137,65 @@ export default class Game{
         this.gameset.container.gameStage.addChild(this.gameset.sprites.sprite);
         // 中層規則-背景
         this.gameset.container.allStage.addChild(this.gameset.container.ruleStage);
-        this.gameset.sprites.ruleBg = new PIXI.Sprite(this.gameset.textures.rulebg);
-        this.gameset.sprites.ruleBg.x = this.gameset.size.w / 2;
-        this.gameset.sprites.ruleBg.y = this.gameset.size.h / 2;
+        this.gameset.sprites.ruleBg = new PIXI.Sprite(this.gameset.textures.bg);
         this.gameset.sprites.ruleBg.width = this.gameset.size.w;
         this.gameset.sprites.ruleBg.height = this.gameset.size.h;
-        this.gameset.sprites.ruleBg.anchor.set(0.5);
         this.gameset.container.ruleStage.addChild(this.gameset.sprites.ruleBg);
+        this.gameset.sprites.ruleText = new PIXI.Text('看準時機，點擊螢幕，\n挖出「極致一球」哈根達斯',{
+            fontSize: this.gameset.size.w*0.4/12,
+            fill: ['#ffffff'],
+            align: 'center'
+        });
+        this.gameset.sprites.ruleText.x = this.gameset.size.w/2 - this.gameset.sprites.ruleText.width/2;
+        this.gameset.sprites.ruleText.y = this.gameset.size.h/2 - this.gameset.sprites.ruleText.height/2;
+        this.gameset.container.ruleStage.addChild(this.gameset.sprites.ruleText);
         // 中層規則-按鈕
-        this.gameset.sprites.startbtn = new PIXI.Sprite(this.gameset.textures.startbtn);
-        this.gameset.sprites.startbtn.anchor.set(0.5);
-        this.gameset.sprites.startbtn.x = this.gameset.size.w / 2;
-        this.gameset.sprites.startbtn.y = this.gameset.size.h*0.75;
-        this.gameset.sprites.startbtn.interactive = true;
-        this.gameset.sprites.startbtn.buttonMode = true;
-        this.gameset.sprites.startbtn.on('pointerdown', this.startGame.bind(this));
+        this.gameset.sprites.startgraphics = new PIXI.Graphics();
+        this.gameset.sprites.startgraphics.lineStyle(2, 0xffffff, 1);
+        this.gameset.sprites.startgraphics.beginFill(0xffffff, 0.25);
+        this.gameset.sprites.startgraphics.drawRoundedRect(0, 0, this.gameset.size.w*0.15, this.gameset.size.h*0.1, 30);
+        this.gameset.sprites.startgraphics.endFill();
+        this.gameset.container.ruleStage.addChild(this.gameset.sprites.startgraphics);
+        this.gameset.sprites.startbtn = new PIXI.Text('開始',{
+            fontSize: this.gameset.size.w*0.4/16,
+            fill: ['#ffffff'],
+            align: 'center'
+        });
+        this.gameset.sprites.startbtn.x = this.gameset.size.w/2 -this.gameset.sprites.startbtn.width/2;
+        this.gameset.sprites.startbtn.y = this.gameset.size.h*0.75 -this.gameset.sprites.startbtn.height/2;
+        this.gameset.sprites.startgraphics.x = this.gameset.size.w/2 - this.gameset.sprites.startgraphics.width/2
+        this.gameset.sprites.startgraphics.y = this.gameset.size.h*0.75 - this.gameset.sprites.startgraphics.height/2
+        this.gameset.sprites.startgraphics.interactive = true;
+        this.gameset.sprites.startgraphics.buttonMode = true;
+        this.gameset.sprites.startgraphics.on('pointerdown', this.startGame.bind(this));
         this.gameset.container.ruleStage.addChild(this.gameset.sprites.startbtn);
         this.gameset.container.ruleStage.visible = true;
         // 上層失誤頁-文字
         this.gameset.container.allStage.addChild(this.gameset.container.failStage);
-        this.gameset.sprites.failText = new PIXI.Text('未命中，請再接再厲',{
-            fontSize: 50
-        })
-        this.gameset.sprites.failText.x = this.gameset.size.w / 2 - this.gameset.sprites.failText.width / 2;
-        this.gameset.sprites.failText.y = this.gameset.size.h*0.1;
-        this.gameset.container.failStage.addChild(this.gameset.sprites.failText);
         // 上層失誤頁-按鈕
-        this.gameset.sprites.continuebtn = new PIXI.Sprite(this.gameset.textures.continue);
-        this.gameset.sprites.continuebtn.anchor.set(0.5);
-        this.gameset.sprites.continuebtn.x = this.gameset.size.w / 2;
-        this.gameset.sprites.continuebtn.y = this.gameset.size.h*0.5;
-        this.gameset.sprites.continuebtn.interactive = true;
-        this.gameset.sprites.continuebtn.buttonMode = true;
-        this.gameset.sprites.continuebtn.on('pointerdown', this.continueGame.bind(this));
+        this.gameset.videos.videoF = new PIXI.Sprite(this.gameset.textures.videoF);
+        this.gameset.videos.videoF.width = this.gameset.size.w;
+        this.gameset.videos.videoF.height = this.gameset.size.h;
+        this.gameset.container.failStage.addChild(this.gameset.videos.videoF);
+
+        this.gameset.sprites.continuegraphics = new PIXI.Graphics();
+        this.gameset.sprites.continuegraphics.lineStyle(2, 0xffffff, 1);
+        this.gameset.sprites.continuegraphics.beginFill(0xffffff, 0.25);
+        this.gameset.sprites.continuegraphics.drawRoundedRect(0, 0, this.gameset.size.w*0.15, this.gameset.size.h*0.1, 30);
+        this.gameset.sprites.continuegraphics.endFill();
+        this.gameset.container.failStage.addChild(this.gameset.sprites.continuegraphics);
+        this.gameset.sprites.continuebtn = new PIXI.Text('再來一次',{
+            fontSize: this.gameset.size.w*0.4/16,
+            fill: ['#ffffff'],
+            align: 'center'
+        });
+        this.gameset.sprites.continuebtn.x = this.gameset.size.w/2 -this.gameset.sprites.continuebtn.width/2;
+        this.gameset.sprites.continuebtn.y = this.gameset.size.h*0.75 -this.gameset.sprites.continuebtn.height/2;
+        this.gameset.sprites.continuegraphics.x = this.gameset.size.w/2 - this.gameset.sprites.continuegraphics.width/2
+        this.gameset.sprites.continuegraphics.y = this.gameset.size.h*0.75 - this.gameset.sprites.continuegraphics.height/2
+        this.gameset.sprites.continuegraphics.interactive = true;
+        this.gameset.sprites.continuegraphics.buttonMode = true;
+        this.gameset.sprites.continuegraphics.on('pointerdown', this.continueGame.bind(this));
         this.gameset.container.failStage.addChild(this.gameset.sprites.continuebtn);
         this.gameset.container.failStage.visible = false;
         // 上層結果頁-背景
@@ -179,13 +208,13 @@ export default class Game{
         this.gameset.container.resultStage.visible = false;
         // 上層開始頁-背景
         this.gameset.container.allStage.addChild(this.gameset.container.startStage);
-        this.gameset.sprites.startBg = new PIXI.AnimatedSprite(this.startBgTextureArray);
-        this.gameset.sprites.startBg.x = this.gameset.size.w / 2;
-        this.gameset.sprites.startBg.y = this.gameset.size.h / 2;
-        this.gameset.sprites.startBg.width = this.gameset.size.w;
-        this.gameset.sprites.startBg.height = this.gameset.size.h;
-        this.gameset.sprites.startBg.anchor.set(0.5);
-        this.gameset.container.startStage.addChild(this.gameset.sprites.startBg);
+        this.gameset.sprites.startbg = new PIXI.Sprite(this.gameset.textures.startbg);
+        this.gameset.sprites.startbg.width = this.gameset.size.w;
+        this.gameset.sprites.startbg.height = this.gameset.size.h;
+        this.gameset.container.startStage.addChild(this.gameset.sprites.startbg);
+        this.gameset.videos.videoStart = new PIXI.Sprite(this.gameset.textures.videoStart);
+        this.gameset.videos.videoStart.width = this.gameset.size.w;
+        this.gameset.videos.videoStart.height = this.gameset.size.h;
         // 上層開始頁-軌道
         this.gameset.sprites.slider = this.gameset.container.startStage.addChild(
             new PIXI.Graphics()
@@ -210,19 +239,19 @@ export default class Game{
                 .endFill(),
         );
         this.gameset.sprites.slide.interactive = true;
-        this.gameset.sprites.handle = this.gameset.sprites.slider.addChild(
-            new PIXI.Graphics()
-                .beginFill(0x000000)
-                .drawCircle(0, 0, 8)
-                .endFill(),
-        );
-        this.gameset.sprites.handle.position.set(this.gameset.size.w/2*0.1, this.gameset.size.h*0.8+2);
+        this.gameset.sprites.handle = new PIXI.Sprite(this.gameset.textures.sprite);
+        this.gameset.sprites.slider.addChild(this.gameset.sprites.handle);
+        this.gameset.sprites.handle.x = this.gameset.size.w/2*0.1
+        this.gameset.sprites.handle.y = this.gameset.size.h*0.8+2 - this.gameset.sprites.handle.height/2;
+        this.gameset.sprites.handle.anchor.set(0.5);
+        this.gameset.sprites.handle.width = this.gameset.size.w*0.05;
+        this.gameset.sprites.handle.height = this.gameset.size.w*0.05;
         this.gameset.sprites.handle.interactive = true;
         this.gameset.sprites.handle.buttonMode = true;
         this.gameset.sprites.handle
             .on('pointerdown', this.onDragStart)
-            .on('pointerup', this.onDragEnd)
-            .on('pointerupoutside', this.onDragEnd)
+            .on('pointerup', this.onDragEnd.bind(this))
+            .on('pointerupoutside', this.onDragEnd.bind(this))
             .on('pointermove', this.onDragMove.bind(this));
         this.gameset.container.startStage.visible = true;
         // 上層結果頁-按鈕
@@ -266,62 +295,106 @@ export default class Game{
         }
     }
     shootBar(){
+        PIXI.sound.add('my-sound', 'sound/attack.mp3');
+        PIXI.sound.play('my-sound');
         if (this.gameset.sprites.outerBar.x>this.gameset.sprites.pointBar.x && this.gameset.sprites.outerBar.x<this.gameset.sprites.pointBar.x+this.gameset.sprites.pointBar.width){
             this.gameset.bar_ticker.stop();
             this.gameset.container.resultStage.visible = true;
             this.gameset.sprites.sprite.interactive = false;
-            const basicText = new PIXI.Text('成功',{
-                fontSize: 50,
-                fill: ['#ffffff']
+            this.gameset.videos.videoS = new PIXI.Sprite(this.gameset.textures.videoS);
+            this.gameset.videos.videoS.width = this.gameset.size.w;
+            this.gameset.videos.videoS.height = this.gameset.size.h;
+            this.gameset.container.resultStage.addChild(this.gameset.videos.videoS);
+            this.videoS.currentTime = 0;
+            this.videoS.play();
+            const basicText = new PIXI.Text('完美達成，\n果然是極致玩家！',{
+                fontSize: this.gameset.size.w*0.4/12,
+                fill: ['#ffffff'],
+                align: 'center',
+                fontWeight: 'bold'
             });
             basicText.x = this.gameset.sprites.resultBg.width/2 - basicText.width/2;
             basicText.y = this.gameset.sprites.resultBg.height/2 - basicText.height/2;
-        
-            this.gameset.video.width = this.gameset.sprites.resultBg.width
-            this.gameset.video.height = this.gameset.sprites.resultBg.height
-            this.gameset.container.resultStage.addChild(this.gameset.video);
+            this.videoS.onended = ()=>{
+                this.gameset.container.resultStage.addChild(basicText);
+            }
+            
             this.status = 'success'
         }
         else if(this.gameset.sprites.outerBar.x<this.gameset.sprites.pointBar.x && this.gameset.hearts>1){
             this.gameset.container.failStage.removeChild(this.gameset.sprites.failText);
-            this.gameset.sprites.failText = new PIXI.Text('未命中，請再接再厲(失敗1)',{
-                fontSize: 50
-            })
+            this.gameset.sprites.failText = new PIXI.Text('差一點就近乎極致了，\n再接再厲！',{
+                fontSize: this.gameset.size.w*0.4/12,
+                fill: ['#ffffff'],
+                align: 'center',
+                fontWeight: 'bold'
+            });
             this.gameset.sprites.failText.x = this.gameset.size.w / 2 - this.gameset.sprites.failText.width / 2;
-            this.gameset.sprites.failText.y = this.gameset.size.h*0.1;
-            this.gameset.container.failStage.addChild(this.gameset.sprites.failText);
+            this.gameset.sprites.failText.y = this.gameset.size.h*0.3;
             this.gameset.container.failStage.visible = true;
+            this.gameset.sprites.continuebtn.visible = false;
+            this.gameset.sprites.continuegraphics.visible = false;
             this.gameset.sprites.sprite.interactive = false;
+            this.videoF.currentTime = 0;
+            this.videoF.play();
             this.gameset.hearts--;
             this.countHeart();
             this.gameset.bar_ticker.stop();
+            this.videoF.onended = ()=>{
+                this.gameset.container.failStage.addChild(this.gameset.sprites.failText);
+                this.gameset.sprites.continuebtn.visible = true;
+                this.gameset.sprites.continuegraphics.visible = true;
+            }
         }
         else if(this.gameset.sprites.outerBar.x>this.gameset.sprites.pointBar.x+this.gameset.sprites.pointBar.width && this.gameset.hearts>1){
             this.gameset.container.failStage.removeChild(this.gameset.sprites.failText);
-            this.gameset.sprites.failText = new PIXI.Text('未命中，請再接再厲(失敗2)',{
-                fontSize: 50
-            })
+            this.gameset.sprites.failText = new PIXI.Text('差一點就近乎極致了，\n再接再厲！',{
+                fontSize: this.gameset.size.w*0.4/12,
+                fill: ['#ffffff'],
+                align: 'center',
+                fontWeight: 'bold'
+            });
             this.gameset.sprites.failText.x = this.gameset.sprites.resultBg.width/2 - this.gameset.sprites.failText.width / 2;
-            this.gameset.sprites.failText.y = this.gameset.sprites.resultBg.height*0.1;
-            this.gameset.container.failStage.addChild(this.gameset.sprites.failText);
+            this.gameset.sprites.failText.y = this.gameset.sprites.resultBg.height*0.3;
             this.gameset.container.failStage.visible = true;
+            this.gameset.sprites.continuebtn.visible = false;
+            this.gameset.sprites.continuegraphics.visible = false;
             this.gameset.sprites.sprite.interactive = false;
+            this.videoF.currentTime = 0;
+            this.videoF.play();
             this.gameset.hearts--;
             this.countHeart();
             this.gameset.bar_ticker.stop();
+            this.videoF.onended = ()=>{
+                this.gameset.container.failStage.addChild(this.gameset.sprites.failText);
+                this.gameset.sprites.continuebtn.visible = true;
+                this.gameset.sprites.continuegraphics.visible = true;
+            }
         }
         else{
             this.gameset.bar_ticker.stop();
             this.gameset.container.resultStage.visible = true;
             this.gameset.sprites.sprite.interactive = false;
-            const basicText = new PIXI.Text('失敗',{
-                fontSize: 50,
-                fill: ['#ffffff']
+            this.gameset.videos.videoF = new PIXI.Sprite(this.gameset.textures.videoF);
+            this.gameset.videos.videoF.width = this.gameset.size.w;
+            this.gameset.videos.videoF.height = this.gameset.size.h;
+            this.gameset.container.resultStage.addChild(this.gameset.videos.videoF);
+            this.videoF.currentTime = 0;
+            this.videoF.play();
+            const basicText = new PIXI.Text('別氣餒！\n相信你在前往極致的路上。',{
+                fontSize: this.gameset.size.w*0.4/12,
+                fill: ['#ffffff'],
+                align: 'center',
+                fontWeight: 'bold'
             });
             basicText.x = this.gameset.sprites.resultBg.width/2 - basicText.width/2;
             basicText.y = this.gameset.sprites.resultBg.height/2 - basicText.height/2;
-            this.gameset.container.resultStage.addChild(basicText);
-            this.status = 'fail'
+            this.status = 'fail';
+            setTimeout(()=>{
+                this.gameset.container.resultStage.addChild(basicText);
+                this.gameset.sprites.continuebtn.visible = true;
+                this.gameset.sprites.continuegraphics.visible = true;
+            },4000)
         }
     }
     startGame(){
@@ -389,24 +462,30 @@ export default class Game{
     }
     
     onDragEnd() {
-        this.alpha = 1;
-        this.dragging = false;
-        this.data = null;
+        gsap.to(this.gameset.sprites.handle, {duration: 1, x: this.gameset.sprites.slide.width/0.9*0.05});
+        this.gameset.sprites.handle.alpha = 1;
+        this.gameset.sprites.handle.dragging = false;
+        this.gameset.sprites.handle.data = null;
     }
     
     onDragMove() {
         if (this.gameset.sprites.handle.dragging) {
-            
             const newPosition = this.gameset.sprites.handle.data.getLocalPosition(this.gameset.sprites.handle.parent);
             if(newPosition.x<this.gameset.sprites.slide.width/0.9*0.05){
                 newPosition.x = this.gameset.sprites.slide.width/0.9*0.05
             }
             else if(newPosition.x>this.gameset.sprites.slide.width/0.9*0.95){
-                // newPosition.x = this.gameset.sprites.slider.width/0.9*0.95;
-                this.gameset.container.startStage.visible = false;
+                newPosition.x=this.gameset.sprites.slide.width/0.9*0.95
+                this.videoStart.currentTime = 0;
+                this.videoStart.play();
+                this.gameset.container.startStage.addChild(this.gameset.videos.videoStart);
+                
+                this.videoStart.onended = ()=>{
+                    this.gameset.container.startStage.visible = false
+                }
+                
             }
             this.gameset.sprites.handle.x = newPosition.x;
-            this.gameset.sprites.startBg.gotoAndStop(Math.floor(this.gameset.sprites.handle.x/this.gameset.sprites.slide.width*0.9*10));
         }
     }
 }
