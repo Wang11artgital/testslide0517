@@ -410,15 +410,15 @@ export default class Game{
         this.gameset.container.heartArea.removeChildren();
         for (let i = 3; i > 0; i--){
             let heart = new PIXI.Sprite(this.gameset.textures.heart);
-            heart.width = this.gameset.size.w*0.1;
-            heart.height = this.gameset.size.w*0.1;
-            heart.y = (i-1)*this.gameset.size.h*0.2;
+            heart.width = this.gameset.sprites.bg.width*0.1;
+            heart.height = this.gameset.sprites.bg.width*0.1;
+            heart.y = (i-1)*this.gameset.sprites.bg.height*0.2;
             if(i>this.gameset.hearts){
                 let mask = new PIXI.Sprite(this.gameset.textures.mask);
                 mask.anchor.set(0.5)
                 this.gameset.container.heartArea.addChild(mask);
-                mask.x= this.gameset.size.w*0.05;
-                mask.y=heart.y+ this.gameset.size.w*0.05;
+                mask.x= this.gameset.sprites.bg.width*0.05;
+                mask.y=heart.y+ this.gameset.sprites.bg.width*0.05;
                 heart.mask = mask;
             }
             this.gameset.container.heartArea.addChild(heart);
