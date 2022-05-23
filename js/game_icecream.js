@@ -142,12 +142,12 @@ export default class Game{
         this.gameset.sprites.ruleBg.height = this.gameset.size.h;
         this.gameset.container.ruleStage.addChild(this.gameset.sprites.ruleBg);
         this.gameset.sprites.ruleText = new PIXI.Text('看準時機，點擊螢幕，\n挖出「極致一球」哈根達斯',{
-            fontSize: this.gameset.size.w*0.4/12,
+            fontSize: this.gameset.sprites.ruleBg.width*0.4/12,
             fill: ['#ffffff'],
             align: 'center'
         });
-        this.gameset.sprites.ruleText.x = this.gameset.size.w/2 - this.gameset.sprites.ruleText.width/2;
-        this.gameset.sprites.ruleText.y = this.gameset.size.h/2 - this.gameset.sprites.ruleText.height/2;
+        this.gameset.sprites.ruleText.x = this.gameset.sprites.ruleBg.width/2 - this.gameset.sprites.ruleText.width/2;
+        this.gameset.sprites.ruleText.y = this.gameset.sprites.ruleBg.height/2 - this.gameset.sprites.ruleText.height/2;
         this.gameset.container.ruleStage.addChild(this.gameset.sprites.ruleText);
         // 中層規則-按鈕
         this.gameset.sprites.startgraphics = new PIXI.Graphics();
@@ -157,14 +157,14 @@ export default class Game{
         this.gameset.sprites.startgraphics.endFill();
         this.gameset.container.ruleStage.addChild(this.gameset.sprites.startgraphics);
         this.gameset.sprites.startbtn = new PIXI.Text('開始',{
-            fontSize: this.gameset.size.w*0.4/16,
+            fontSize: this.gameset.sprites.ruleBg.width*0.4/16,
             fill: ['#ffffff'],
             align: 'center'
         });
-        this.gameset.sprites.startbtn.x = this.gameset.size.w/2 -this.gameset.sprites.startbtn.width/2;
-        this.gameset.sprites.startbtn.y = this.gameset.size.h*0.75 -this.gameset.sprites.startbtn.height/2;
-        this.gameset.sprites.startgraphics.x = this.gameset.size.w/2 - this.gameset.sprites.startgraphics.width/2
-        this.gameset.sprites.startgraphics.y = this.gameset.size.h*0.75 - this.gameset.sprites.startgraphics.height/2
+        this.gameset.sprites.startbtn.x = this.gameset.sprites.ruleBg.width/2 -this.gameset.sprites.startbtn.width/2;
+        this.gameset.sprites.startbtn.y = this.gameset.sprites.ruleBg.height*0.75 -this.gameset.sprites.startbtn.height/2;
+        this.gameset.sprites.startgraphics.x = this.gameset.sprites.ruleBg.width/2 - this.gameset.sprites.startgraphics.width/2
+        this.gameset.sprites.startgraphics.y = this.gameset.sprites.ruleBg.height*0.75 - this.gameset.sprites.startgraphics.height/2
         this.gameset.sprites.startgraphics.interactive = true;
         this.gameset.sprites.startgraphics.buttonMode = true;
         this.gameset.sprites.startgraphics.on('pointerdown', this.startGame.bind(this));
@@ -185,7 +185,7 @@ export default class Game{
         this.gameset.sprites.continuegraphics.endFill();
         this.gameset.container.failStage.addChild(this.gameset.sprites.continuegraphics);
         this.gameset.sprites.continuebtn = new PIXI.Text('再來一次',{
-            fontSize: this.gameset.size.w*0.4/16,
+            fontSize: this.gameset.container.failStage.width*0.4/16,
             fill: ['#ffffff'],
             align: 'center'
         });
@@ -302,13 +302,13 @@ export default class Game{
             this.gameset.container.resultStage.visible = true;
             this.gameset.sprites.sprite.interactive = false;
             this.gameset.videos.videoS = new PIXI.Sprite(this.gameset.textures.videoS);
-            this.gameset.videos.videoS.width = this.gameset.size.w;
-            this.gameset.videos.videoS.height = this.gameset.size.h;
+            this.gameset.videos.videoS.width = this.gameset.sprites.resultBg.width;
+            this.gameset.videos.videoS.height = this.gameset.sprites.resultBg.height;
             this.gameset.container.resultStage.addChild(this.gameset.videos.videoS);
             this.videoS.currentTime = 0;
             this.videoS.play();
             const basicText = new PIXI.Text('完美達成，\n果然是極致玩家！',{
-                fontSize: this.gameset.size.w*0.4/12,
+                fontSize: this.gameset.sprites.resultBg.width*0.4/12,
                 fill: ['#ffffff'],
                 align: 'center',
                 fontWeight: 'bold'
@@ -324,13 +324,13 @@ export default class Game{
         else if(this.gameset.sprites.outerBar.x<this.gameset.sprites.pointBar.x && this.gameset.hearts>1){
             this.gameset.container.failStage.removeChild(this.gameset.sprites.failText);
             this.gameset.sprites.failText = new PIXI.Text('差一點就近乎極致了，\n再接再厲！',{
-                fontSize: this.gameset.size.w*0.4/12,
+                fontSize: this.gameset.sprites.bg.width*0.4/12,
                 fill: ['#ffffff'],
                 align: 'center',
                 fontWeight: 'bold'
             });
-            this.gameset.sprites.failText.x = this.gameset.size.w / 2 - this.gameset.sprites.failText.width / 2;
-            this.gameset.sprites.failText.y = this.gameset.size.h*0.3;
+            this.gameset.sprites.failText.x = this.gameset.sprites.bg.width / 2 - this.gameset.sprites.failText.width / 2;
+            this.gameset.sprites.failText.y = this.gameset.sprites.bg.height*0.3;
             this.gameset.container.failStage.visible = true;
             this.gameset.sprites.continuebtn.visible = false;
             this.gameset.sprites.continuegraphics.visible = false;
@@ -349,13 +349,13 @@ export default class Game{
         else if(this.gameset.sprites.outerBar.x>this.gameset.sprites.pointBar.x+this.gameset.sprites.pointBar.width && this.gameset.hearts>1){
             this.gameset.container.failStage.removeChild(this.gameset.sprites.failText);
             this.gameset.sprites.failText = new PIXI.Text('差一點就近乎極致了，\n再接再厲！',{
-                fontSize: this.gameset.size.w*0.4/12,
+                fontSize: this.gameset.sprites.bg.width*0.4/12,
                 fill: ['#ffffff'],
                 align: 'center',
                 fontWeight: 'bold'
             });
-            this.gameset.sprites.failText.x = this.gameset.sprites.resultBg.width/2 - this.gameset.sprites.failText.width / 2;
-            this.gameset.sprites.failText.y = this.gameset.sprites.resultBg.height*0.3;
+            this.gameset.sprites.failText.x = this.gameset.sprites.bg.width/2 - this.gameset.sprites.failText.width / 2;
+            this.gameset.sprites.failText.y = this.gameset.sprites.bg.height*0.3;
             this.gameset.container.failStage.visible = true;
             this.gameset.sprites.continuebtn.visible = false;
             this.gameset.sprites.continuegraphics.visible = false;
@@ -376,13 +376,13 @@ export default class Game{
             this.gameset.container.resultStage.visible = true;
             this.gameset.sprites.sprite.interactive = false;
             this.gameset.videos.videoF = new PIXI.Sprite(this.gameset.textures.videoF);
-            this.gameset.videos.videoF.width = this.gameset.size.w;
-            this.gameset.videos.videoF.height = this.gameset.size.h;
+            this.gameset.videos.videoF.width = this.gameset.sprites.resultBg.width;
+            this.gameset.videos.videoF.height = this.gameset.sprites.resultBg.height;
             this.gameset.container.resultStage.addChild(this.gameset.videos.videoF);
             this.videoF.currentTime = 0;
             this.videoF.play();
             const basicText = new PIXI.Text('別氣餒！\n相信你在前往極致的路上。',{
-                fontSize: this.gameset.size.w*0.4/12,
+                fontSize: this.gameset.sprites.resultBg.width*0.4/12,
                 fill: ['#ffffff'],
                 align: 'center',
                 fontWeight: 'bold'
