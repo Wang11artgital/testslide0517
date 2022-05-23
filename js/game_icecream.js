@@ -249,7 +249,7 @@ export default class Game{
         this.gameset.sprites.handle.interactive = true;
         this.gameset.sprites.handle.buttonMode = true;
         this.gameset.sprites.handle
-            .on('pointerdown', this.onDragStart)
+            .on('pointerdown', this.onDragStart.bind(this))
             .on('pointerup', this.onDragEnd.bind(this))
             .on('pointerupoutside', this.onDragEnd.bind(this))
             .on('pointermove', this.onDragMove.bind(this));
@@ -456,9 +456,10 @@ export default class Game{
         this.gameset.container.allStage.position.set(window.innerWidth/2 - this.gameset.size.w/2,window.innerHeight/2 - this.gameset.size.h/2)
     }
     onDragStart(event) {
-        this.data = event.data;
-        this.alpha = 0.5;
-        this.dragging = true;
+        this.gameset.sprites.handle.data = event.data
+        this.videoStart.currentTime = 0;
+        this.gameset.sprites.handle.alpha = 0.5;
+        this.gameset.sprites.handle.dragging = true;
     }
     
     onDragEnd() {
@@ -476,7 +477,6 @@ export default class Game{
             }
             else if(newPosition.x>this.gameset.sprites.slide.width/0.9*0.95){
                 newPosition.x=this.gameset.sprites.slide.width/0.9*0.95
-                this.videoStart.currentTime = 0;
                 this.videoStart.play();
                 this.gameset.container.startStage.addChild(this.gameset.videos.videoStart);
                 
