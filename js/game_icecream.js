@@ -37,6 +37,7 @@ export default class Game{
         this.videoStart = document.createElement("video");
         this.videoS = document.createElement("video");
         this.videoF = document.createElement("video");
+        this.sound = ''
     }
     gameLoad() {
         // 執行遊戲
@@ -62,6 +63,7 @@ export default class Game{
                 .add('startbtn','image/startbtn.png')
                 .add('nice','image/nice.png')
                 .add('startbg','videos/start.jpg')
+                // .add('music', 'sound/sword.mp3')
                 .load((loader, resource)=>{
                     this.gameset.textures.bg = new PIXI.Texture(resource.bg.texture)
                     this.gameset.textures.sprite = new PIXI.Texture(resource.sprite.texture)
@@ -76,6 +78,7 @@ export default class Game{
                     this.gameset.textures.videoStart = PIXI.Texture.from(this.videoStart);
                     this.gameset.textures.videoS = PIXI.Texture.from(this.videoS);
                     this.gameset.textures.videoF = PIXI.Texture.from(this.videoF);
+                    // this.sound = resource.music.sound;
                 });
             this.gameset.loader.onComplete.add(()=>{this.drawCanvas()});
         }
@@ -266,7 +269,16 @@ export default class Game{
         this.gameset.container.allStage.addChild(this.gameset.sprites.exit);
         this.gameset.bar_ticker.add(this.barLoop,this);
         this.gameset.bar_ticker.start();
-        this.status = 'game'
+        this.status = 'game';
+        // this.sound.play();
+        PIXI.sound.Sound.from({
+            url: 'sound/sword.mp3',
+            autoPlay: true,
+            loop: true,
+            complete: function() {
+                console.log('Sound finished');
+            }
+        });
         this.countHeart();
         this.resizeCanvas();
     }
@@ -295,8 +307,8 @@ export default class Game{
         }
     }
     shootBar(){
-        PIXI.sound.add('my-sound', 'sound/attack.mp3');
-        PIXI.sound.play('my-sound');
+        // PIXI.sound.add('my-sound', 'sound/attack.mp3');
+        // PIXI.sound.play('my-sound');
         if (this.gameset.sprites.outerBar.x>this.gameset.sprites.pointBar.x && this.gameset.sprites.outerBar.x<this.gameset.sprites.pointBar.x+this.gameset.sprites.pointBar.width){
             this.gameset.bar_ticker.stop();
             this.gameset.container.resultStage.visible = true;
@@ -390,11 +402,11 @@ export default class Game{
             basicText.x = this.gameset.sprites.resultBg.width/2 - basicText.width/2;
             basicText.y = this.gameset.sprites.resultBg.height/2 - basicText.height/2;
             this.status = 'fail';
-            setTimeout(()=>{
+            this.videoF.onended = ()=>{
                 this.gameset.container.resultStage.addChild(basicText);
                 this.gameset.sprites.continuebtn.visible = true;
                 this.gameset.sprites.continuegraphics.visible = true;
-            },4000)
+            }
         }
     }
     startGame(){
@@ -475,11 +487,10 @@ export default class Game{
             if(newPosition.x<this.gameset.sprites.slide.width/0.9*0.05){
                 newPosition.x = this.gameset.sprites.slide.width/0.9*0.05
             }
-            else if(newPosition.x>this.gameset.sprites.slide.width/0.9*0.95){
+            else if(newPosition.x>=this.gameset.sprites.slide.width/0.9*0.95){
                 newPosition.x=this.gameset.sprites.slide.width/0.9*0.95
-                this.videoStart.play();
                 this.gameset.container.startStage.addChild(this.gameset.videos.videoStart);
-                
+                this.videoStart.play();
                 this.videoStart.onended = ()=>{
                     this.gameset.container.startStage.visible = false
                 }
