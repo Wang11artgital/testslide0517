@@ -271,13 +271,8 @@ export default class Game{
         this.gameset.bar_ticker.start();
         this.status = 'game';
         // this.sound.play();
-        PIXI.sound.Sound.from({
-            url: 'sound/sword.mp3',
-            autoPlay: true,
-            loop: true,
-            complete: function() {
-                console.log('Sound finished');
-            }
+        this.sound = PIXI.sound.Sound.from({
+            url: 'sound/sword.mp3'
         });
         this.countHeart();
         this.resizeCanvas();
@@ -307,8 +302,7 @@ export default class Game{
         }
     }
     shootBar(){
-        // PIXI.sound.add('my-sound', 'sound/attack.mp3');
-        // PIXI.sound.play('my-sound');
+        this.sound.play();
         if (this.gameset.sprites.outerBar.x>this.gameset.sprites.pointBar.x && this.gameset.sprites.outerBar.x<this.gameset.sprites.pointBar.x+this.gameset.sprites.pointBar.width){
             this.gameset.bar_ticker.stop();
             this.gameset.container.resultStage.visible = true;
