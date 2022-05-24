@@ -63,7 +63,7 @@ export default class Game{
                 .add('startbtn','image/startbtn.png')
                 .add('nice','image/nice.png')
                 .add('startbg','videos/start.jpg')
-                // .add('music', 'sound/sword.mp3')
+                .add('music', 'sound/sword.mp3')
                 .load((loader, resource)=>{
                     this.gameset.textures.bg = new PIXI.Texture(resource.bg.texture)
                     this.gameset.textures.sprite = new PIXI.Texture(resource.sprite.texture)
@@ -78,7 +78,7 @@ export default class Game{
                     this.gameset.textures.videoStart = PIXI.Texture.from(this.videoStart);
                     this.gameset.textures.videoS = PIXI.Texture.from(this.videoS);
                     this.gameset.textures.videoF = PIXI.Texture.from(this.videoF);
-                    // this.sound = resource.music.sound;
+                    this.sound = PIXI.sound.Sound.from(resource.music.sound);
                 });
             this.gameset.loader.onComplete.add(()=>{this.drawCanvas()});
         }
@@ -270,10 +270,6 @@ export default class Game{
         this.gameset.bar_ticker.add(this.barLoop,this);
         this.gameset.bar_ticker.start();
         this.status = 'game';
-        // this.sound.play();
-        this.sound = PIXI.sound.Sound.from({
-            url: 'sound/sword.mp3'
-        });
         this.countHeart();
         this.resizeCanvas();
     }
@@ -302,7 +298,7 @@ export default class Game{
         }
     }
     shootBar(){
-        this.sound.play();
+        this.sound.play()
         if (this.gameset.sprites.outerBar.x>this.gameset.sprites.pointBar.x && this.gameset.sprites.outerBar.x<this.gameset.sprites.pointBar.x+this.gameset.sprites.pointBar.width){
             this.gameset.bar_ticker.stop();
             this.gameset.container.resultStage.visible = true;
